@@ -1,0 +1,349 @@
+\documentclass[12pt,a4paper]{ctexart}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,array,graphicx,float,xcolor,hyperref}
+\usepackage{longtable}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.35em}
+
+% Automatically generated values. Run python3 run_all.py before compiling.
+\IfFileExists{generated/report_values.tex}{\input{generated/report_values.tex}}{}
+
+% Fallback values when Q6 has not yet been run.
+\providecommand{\QSixSeeds}{--}
+\providecommand{\QSixSGDEpochOneMean}{--}
+\providecommand{\QSixSGDEpochOneStd}{--}
+\providecommand{\QSixSGDEpochTwoMean}{--}
+\providecommand{\QSixSGDEpochTwoStd}{--}
+\providecommand{\QSixSGDEpochThreeMean}{--}
+\providecommand{\QSixSGDEpochThreeStd}{--}
+\providecommand{\QSixSGDSecondsMean}{--}
+\providecommand{\QSixSGDSecondsStd}{--}
+\providecommand{\QSixNGEpochOneMean}{--}
+\providecommand{\QSixNGEpochOneStd}{--}
+\providecommand{\QSixNGEpochTwoMean}{--}
+\providecommand{\QSixNGEpochTwoStd}{--}
+\providecommand{\QSixNGEpochThreeMean}{--}
+\providecommand{\QSixNGEpochThreeStd}{--}
+\providecommand{\QSixNGSecondsMean}{--}
+\providecommand{\QSixNGSecondsStd}{--}
+
+\newcommand{\placeholder}[1]{\textcolor{red}{\textbf{【提交前核对：#1】}}}
+\newcommand{\figifexists}[3]{%
+  \IfFileExists{#1}{%
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=#2\textwidth]{#1}
+      \caption{#3}
+    \end{figure}
+  }{\par\placeholder{缺少图片文件 \texttt{#1}，请先运行一键脚本。}\par}%
+}
+
+\title{神经网络的模型与应用：期终考核答题报告}
+\author{姓名：宋嘉硕 \qquad 学号：25114020014}
+\date{2026年7月}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{说明}
+\addcontentsline{toc}{section}{说明}
+本文完成第2、4、5、6、7题。所有数值实验均可通过项目根目录下的
+\texttt{run\_all.py} 一次性复现。运行命令为：
+\begin{verbatim}
+python3 run_all.py
+xelatex report.tex
+xelatex report.tex
+\end{verbatim}
+如只需快速检查第2、4、5、7题，可使用：
+\begin{verbatim}
+python3 run_all.py --skip-q6
+\end{verbatim}
+
+\section{第2题：Ordinary renewal process 的高阶统计量}
+设更新间隔为独立同分布随机变量
+\[
+X_1,X_2,\ldots \overset{\mathrm{i.i.d.}}{\sim}F,
+\]
+第 $k$ 次更新时刻为
+\[
+S_k=X_1+\cdots+X_k,
+\]
+并定义截至时刻 $t$ 的更新次数
+\[
+N(t)=\max\{k:S_k\leq t\}.
+\]
+记 $F^{*k}(t)=\mathbb{P}(S_k\leq t)$ 为 $F$ 的 $k$ 次卷积分布函数。
+
+\subsection{一阶矩}
+由于
+\[
+\{N(t)\geq k\}\Longleftrightarrow \{S_k\leq t\},
+\]
+可写成
+\[
+N(t)=\sum_{k=1}^{\infty}\mathbf{1}_{\{S_k\leq t\}}.
+\]
+取期望得到更新函数
+\[
+\boxed{m(t)=\mathbb{E}[N(t)]=\sum_{k=1}^{\infty}F^{*k}(t).}
+\]
+
+\subsection{下降阶乘矩}
+定义下降阶乘
+\[
+(N(t))_r=N(t)(N(t)-1)\cdots(N(t)-r+1).
+\]
+利用 $(N(t))_r=r!\binom{N(t)}{r}$，并按照最后一个下标 $k_r=k$ 分类，可得
+\[
+\boxed{
+\mathbb{E}[(N(t))_r]
+=r!\sum_{k=r}^{\infty}\binom{k-1}{r-1}F^{*k}(t).
+}
+\]
+
+\subsection{任意 $n$ 阶普通矩}
+利用第二类 Stirling 数 $S(n,r)$ 的恒等式
+\[
+N(t)^n=\sum_{r=1}^{n}S(n,r)(N(t))_r,
+\]
+得到
+\[
+\boxed{
+\mathbb{E}[N(t)^n]
+=\sum_{r=1}^{n}S(n,r)r!
+\sum_{k=r}^{\infty}\binom{k-1}{r-1}F^{*k}(t).
+}
+\]
+这就是更新计数 $N(t)$ 的任意阶矩表达式。
+
+\subsection{二阶矩和方差}
+当 $n=2$ 时，
+\[
+\mathbb{E}[N(t)^2]
+=\sum_{k=1}^{\infty}F^{*k}(t)
++2\sum_{k=2}^{\infty}(k-1)F^{*k}(t),
+\]
+因此
+\[
+\boxed{
+\operatorname{Var}(N(t))
+=\sum_{k=1}^{\infty}F^{*k}(t)
++2\sum_{k=2}^{\infty}(k-1)F^{*k}(t)
+-\left(\sum_{k=1}^{\infty}F^{*k}(t)\right)^2.
+}
+\]
+
+\subsection{数值验证}
+取指数更新间隔 $X_i\sim\mathrm{Exp}(\lambda)$，其中
+\[
+\lambda=\QTwoRate,\qquad t=\QTwoHorizon.
+\]
+此时 $N(t)\sim\mathrm{Poisson}(\lambda t)$，理论均值与方差均为
+\[
+\lambda t=\QTwoTheoryMean.
+\]
+在 \QTwoTrials 次 Monte Carlo 模拟中，得到
+\[
+\widehat{\mathbb{E}[N(t)]}=\QTwoEmpMean,\qquad
+\widehat{\operatorname{Var}(N(t))}=\QTwoEmpVar.
+\]
+模拟结果与理论值一致。
+\figifexists{q2_poisson_validation.png}{0.72}{指数更新间隔下，更新计数分布与 Poisson 理论分布的比较。}
+
+\section{第4题：神经元群体编码与刺激方向估计}
+题目给出的第 $a$ 个神经元调谐函数为
+\[
+f_a(s)=\exp\left[-\frac{(s-s_a)^2}{2\sigma_a^2}\right],
+\qquad s\in[0,180^\circ],\quad \sigma_a>0,
+\]
+其中 $s_a$ 为第 $a$ 个神经元的偏好方向，$\sigma_a$ 为调谐宽度参数。
+
+设在长度为 $T$ 的观测窗口内，第 $a$ 个神经元记录到的脉冲数为 $n_a$。由于各神经元相互独立，且均服从 Poisson 过程，
+\[
+n_a\sim\mathrm{Poisson}(Tf_a(s)).
+\]
+联合似然为
+\[
+p(\mathbf{n}\mid s)=\prod_{a=1}^{N}
+\frac{[Tf_a(s)]^{n_a}}{n_a!}
+\exp[-Tf_a(s)].
+\]
+忽略与 $s$ 无关的常数项，对数似然为
+\[
+\ell(s)=\sum_{a=1}^{N}\left[n_a\log f_a(s)-Tf_a(s)\right].
+\]
+因此采用网格搜索构造最大似然估计
+\[
+\boxed{
+\hat{s}_{\mathrm{MLE}}=\arg\max_{s\in[0,180^\circ]}\ell(s).
+}
+\]
+
+题目给出的贝叶斯损失为平方差，因此使用直接误差
+\[
+e=\hat{s}-s,
+\qquad
+\mathrm{MSE}=\mathbb{E}\big[(\hat{s}-s)^2\big].
+\]
+高斯调谐函数的导数为
+\[
+f_a'(s)=-\frac{s-s_a}{\sigma_a^2}f_a(s).
+\]
+对于独立 Poisson 神经元，Fisher 信息为
+\[
+I(s)=T\sum_{a=1}^{N}\frac{[f_a'(s)]^2}{f_a(s)}
+=T\sum_{a=1}^{N}\frac{(s-s_a)^2}{\sigma_a^4}f_a(s).
+\]
+无偏估计量满足 Cram\'{e}r--Rao 下界
+\[
+\operatorname{Var}(\hat{s})\geq \frac{1}{I(s)}.
+\]
+一般情况下，该模型的有限样本 MVUB 估计不容易写成简单闭式表达式。本文使用 MLE 作为数值近似，并通过经验偏差与 Cram\'{e}r--Rao 下界判断其是否接近有效无偏估计。
+
+数值模拟中使用 $N=\QFourNeurons$ 个神经元，令偏好方向均匀分布于 $[0,180^\circ]$，并设置
+\[
+T=\QFourWindow,\qquad
+s_{\mathrm{true}}=\QFourTrueDeg^\circ,\qquad
+\sigma_a=\QFourSigmaDeg^\circ.
+\]
+在 \QFourTrials 次独立模拟中，得到：
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+指标 & 数值\\
+\midrule
+经验偏差 & $\QFourBiasRad\ \mathrm{rad}=\QFourBiasDeg^{\circ}$\\
+经验 MSE & $\QFourMSE\ \mathrm{rad}^2$\\
+经验 RMSE & $\QFourRMSEDeg^{\circ}$\\
+Fisher 信息 & $\QFourFisher$\\
+Cram\'{e}r--Rao 下界 & $\QFourCRLB\ \mathrm{rad}^2$\\
+MSE / CRLB & $\QFourRatio$\\
+\bottomrule
+\end{tabular}
+\caption{高斯调谐函数下的方向解码实验结果。}
+\end{table}
+经验偏差接近于零，且经验 MSE 仅比理论下界高约 $\QFourExcessPct\%$。因此，在当前参数下，MLE 近似无偏，并接近有效估计。
+\figifexists{q4_error_hist.png}{0.70}{\QFourTrials 次独立模拟中的方向估计误差直方图。}
+
+\section{第5题：音频盲源分离}
+使用 FastICA 对附件中的三路混合音频进行盲源分离，并以 PCA 作为基线。PCA 的目标是去除线性相关性，而 FastICA 进一步追求统计独立性。因此，仅比较相关系数是不充分的，还需要结合互信息、峰度和主观试听结果。
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+方法 & 平均绝对非对角相关系数 & 平均互信息 & 绝对峰度\\
+\midrule
+FastICA & $\QFiveFastICACorr$ & $\QFiveFastICAMI$ & $\QFiveFastICAKurt$\\
+PCA baseline & $\QFivePCACorr$ & $\QFivePCAMI$ & $\QFivePCAKurt$\\
+\bottomrule
+\end{tabular}
+\caption{FastICA 与 PCA 的盲源分离指标。}
+\end{table}
+
+FastICA 的平均互信息比 PCA 低约 $\QFiveMIReduction\%$，说明输出分量更接近统计独立。试听结果如下：
+\begin{itemize}
+  \item FastICA component 1：主要为背景声；
+  \item FastICA component 2：主要为人声；
+  \item FastICA component 3：主要为音乐；
+  \item PCA component 1：人声与背景声仍然混合；
+  \item PCA component 2：音乐与背景声仍然混合；
+  \item PCA component 3：主要为背景声。
+\end{itemize}
+因此，FastICA 比 PCA 更适合本实验中的盲源分离任务。由于附件未提供干净的源信号，无法严格计算 SDR 或 SIR，本文使用统计指标、波形图和试听结果进行评价。
+\figifexists{q5_outputs/q5_FastICA.png}{0.83}{FastICA 分离后的三路信号波形。}
+\figifexists{q5_outputs/q5_PCA_baseline.png}{0.83}{PCA 基线方法得到的三路信号波形。}
+
+\section{第6题：MNIST 分类中的 SGD 与近似自然梯度}
+使用一个简单的多层感知机进行 MNIST 手写数字分类：输入维数为 784，隐藏层包含 128 个神经元并采用 $\tanh$ 激活函数，输出层包含 10 个类别。
+
+标准 SGD 更新为
+\[
+\theta_{t+1}=\theta_t-\eta g_t.
+\]
+完整自然梯度需要计算和求逆 Fisher 信息矩阵，代价较高。本文使用对角经验 Fisher 预条件近似：
+\[
+f_t=\beta f_{t-1}+(1-\beta)g_t^2,
+\]
+并采用
+\[
+\theta_{t+1}=\theta_t-
+\eta\frac{g_t}{\sqrt{f_t}+\varepsilon}.
+\]
+该方法忽略参数之间的非对角相关性，因此应称为“对角经验 Fisher 预条件方法”或“近似自然梯度方法”，而不是精确自然梯度。
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+方法 & Epoch 1 & Epoch 2 & Epoch 3\\
+\midrule
+SGD & $\QSixSGDEpochOneMean\pm\QSixSGDEpochOneStd$ & $\QSixSGDEpochTwoMean\pm\QSixSGDEpochTwoStd$ & $\QSixSGDEpochThreeMean\pm\QSixSGDEpochThreeStd$\\
+对角经验 Fisher & $\QSixNGEpochOneMean\pm\QSixNGEpochOneStd$ & $\QSixNGEpochTwoMean\pm\QSixNGEpochTwoStd$ & $\QSixNGEpochThreeMean\pm\QSixNGEpochThreeStd$\\
+\bottomrule
+\end{tabular}
+\caption{\QSixSeeds 个随机种子下的测试准确率均值与样本标准差。}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+方法 & 训练耗时（秒）\\
+\midrule
+SGD & $\QSixSGDSecondsMean\pm\QSixSGDSecondsStd$\\
+对角经验 Fisher & $\QSixNGSecondsMean\pm\QSixNGSecondsStd$\\
+\bottomrule
+\end{tabular}
+\caption{训练耗时均值与样本标准差。}
+\end{table}
+
+\IfFileExists{q6_outputs/q6_accuracy_multiseed.png}{
+\figifexists{q6_outputs/q6_accuracy_multiseed.png}{0.72}{五个随机种子下 MNIST 测试准确率的均值与误差棒。}
+}{
+\placeholder{第6题多随机种子实验尚未运行。请执行 \texttt{python3 run\_all.py} 后重新编译。}
+}
+
+\section{第7题：强化学习求解迷宫最短路径}
+首先将原始 RGB 图片划分成规则网格，将可行走区域与墙壁转换为布尔占用矩阵。程序自动检测黄色起点，并选择一个可达终点。智能体可采取上、下、左、右四种动作。
+
+Q-learning 的更新公式为
+\[
+Q(s_t,a_t)\leftarrow Q(s_t,a_t)+\alpha
+\left[r_t+\gamma\max_aQ(s_{t+1},a)-Q(s_t,a_t)\right].
+\]
+程序使用 $\varepsilon$-greedy 策略平衡探索与利用，并加入 potential-based reward shaping 以加速收敛。BFS 仅用于计算理论最短路径长度，作为结果校验。
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+指标 & 数值\\
+\midrule
+迷宫网格大小 & \texttt{\QSevenGrid}\\
+起点 & \texttt{\QSevenStart}\\
+终点 & \texttt{\QSevenGoal}\\
+BFS 最短路径长度 & $\QSevenBFSLength$\\
+Q-learning 路径长度 & $\QSevenQLength$\\
+Q-learning 是否到达终点 & \texttt{\QSevenReached}\\
+\bottomrule
+\end{tabular}
+\caption{迷宫最短路径实验结果。}
+\end{table}
+
+由于
+\[
+L_{\mathrm{Q-learning}}=\QSevenQLength
+=L_{\mathrm{BFS}}=\QSevenBFSLength,
+\]
+Q-learning 不仅找到了可行路线，而且达到了 BFS 给出的理论最短路径长度。
+\figifexists{q7_qlearning_path.png}{0.80}{Q-learning 学习得到的迷宫最短路径。}
+
+\section{结论}
+本文完成了更新过程高阶矩推导、Poisson 神经元群方向解码、音频盲源分离、MNIST 分类和强化学习迷宫寻路五部分内容。第二题的 Monte Carlo 模拟验证了更新计数矩公式；第四题在题目给定的高斯调谐函数下构造 MLE，并验证其接近 Cram\'{e}r--Rao 下界；第五题中 FastICA 比 PCA 提供了更清晰的源信号分离；第六题比较了 SGD 与对角经验 Fisher 预条件方法；第七题中 Q-learning 获得了与 BFS 相同长度的最短路径。
+
+\end{document}
